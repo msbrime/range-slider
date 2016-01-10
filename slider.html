@@ -154,6 +154,7 @@
         pointerDrag = {
             minimumOffset:Node.offsetLeft,
             maximumOffset:Node.offsetLeft+sliderWidth,
+            lastPointerOffset:0,
             start:0,            
         }
     
@@ -170,15 +171,31 @@
           (ev.clientX <= pointerDrag.maximumOffset) 
          ){
           var finalOffset = ( ( (ev.clientX - pointerDrag.minimumOffset) / sliderWidth ) ) * 100
-          slider.rangeProgress.style.width = finalOffset  + "%"; 
-          this.style.left = finalOffset + "%";   
-          slider.monitorProgress(finalOffset);
+            slider.movePointer(finalOffset,"%");
+            pointerDrag.lastPointerOffset = this.offsetLeft;
          }
        
    });
    
    this.pointer.addEventListener('dragend',function(ev){
-
+        
+       var landingNode = Array.prototype.filter.call(slider.ranges,function(node){
+            var coords = {
+                left :node.offsetLeft,
+                max  :node.offsetLeft + node.offsetWidth 
+            }
+            
+            return ((pointerDrag.lastPointerOffset >= coords.left ) && 
+                    (pointerDrag.lastPointerOffset <= coords.max )
+                   );
+            
+       });
+       
+       console.log(landingNode);
+       
+       console.log(slider.ranges);
+       
+       landingNode[0].click();
        this.classList.add('transitionable');
        slider.rangeProgress.classList.add('transitionable');
    });
