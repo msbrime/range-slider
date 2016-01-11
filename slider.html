@@ -1,3 +1,4 @@
+<!DOCTYPE = "HTML5">
 <html>
 
 <head>
@@ -123,6 +124,18 @@
         }        
         return base;        
     }
+    
+    function getOffset(node){
+        var bodyDims = document.body.getBoundingClientRect();
+        var nodeDims = node.getBoundingClientRect();
+    
+        var offsets = {
+                 left:nodeDims.left - bodyDims.left,
+                 max: (nodeDims.left - bodyDims.left) + node.clientWidth              
+        };
+    
+        return offsets; 
+    }
             
     function RangeSlider(Node,options){
 
@@ -134,10 +147,11 @@
     var cfg = {
         initialValue:500,
         onRangeChange:function(){}
-    }
+    };
     
     options = extend(cfg,options);
    	
+    this.domNode = Node;
    	this.ranges  =
         Node.querySelectorAll(".range");
    	this.size =
@@ -151,49 +165,64 @@
     var slider = this,
         rangeWidth = (100/this.size),
         sliderWidth = Node.clientWidth,
-        pointerDrag = {
-            minimumOffset:Node.offsetLeft,
-            maximumOffset:Node.offsetLeft+sliderWidth,
-            lastPointerOffset:0,
+        position = getOffset(Node),
+        ptDrag = {
+            minOffset:position.left,
+            maxOffset:position.max,
+            lastOffset:0,
             start:0,            
-        }
+        };
+        
+     var clientCoors = 0;
     
     this.movePointer(rangeWidth,"%");
   
    this.pointer.addEventListener('dragstart',function(ev){
-       pointerDrag.start = this.style.left;
+       ev.dataTransfer.setData('text/plain','I am draggable');
+       clientCoors = ev.clientX;
+       console.log(ev);
+       if( (ptDrag.minOffset === 0) || (ptDrag.maxOffset === 0)){
+           position = getOffset(Node);
+           ptDrag.minOffset = position.left;
+           ptDrag.maxOffset = position.max;
+           sliderWidth = Node.clientWidth;
+       }
+       
+       console.log(ptDrag);
+       ptDrag.start = this.style.left;
        this.classList.remove('transitionable');
        slider.rangeProgress.classList.remove('transitionable');
    });
    
    this.pointer.addEventListener('drag',function(ev){
-       if((ev.clientX >= pointerDrag.minimumOffset) &&
-          (ev.clientX <= pointerDrag.maximumOffset) 
-         ){
-          var finalOffset = ( ( (ev.clientX - pointerDrag.minimumOffset) / sliderWidth ) ) * 100
+        
+       ev.preventDefault();
+       ev.stopPropagation();
+       
+    //    if((ev.clientX >= ptDrag.minOffset) &&
+    //       (ev.clientX <= ptDrag.maxOffset) 
+    //      ){
+          
+          console.log(ev);
+          var finalOffset = ( ( (clientCoors - ptDrag.minOffset) / sliderWidth ) ) * 100;
             slider.movePointer(finalOffset,"%");
-            pointerDrag.lastPointerOffset = this.offsetLeft;
-         }
+            
+            ptDrag.lastOffset = getOffset(this).left;
+         //}
        
    });
    
    this.pointer.addEventListener('dragend',function(ev){
         
        var landingNode = Array.prototype.filter.call(slider.ranges,function(node){
-            var coords = {
-                left :node.offsetLeft,
-                max  :node.offsetLeft + node.offsetWidth 
-            }
             
-            return ((pointerDrag.lastPointerOffset >= coords.left ) && 
-                    (pointerDrag.lastPointerOffset <= coords.max )
+            var coords = getOffset(node);
+            
+            return ((ptDrag.lastOffset >= coords.left ) && 
+                    (ptDrag.lastOffset <= coords.max )
                    );
             
        });
-       
-       console.log(landingNode);
-       
-       console.log(slider.ranges);
        
        landingNode[0].click();
        this.classList.add('transitionable');
@@ -225,15 +254,20 @@
             });
             
             node.addEventListener('dragover',function(ev){
-                ev.preventDefault();
+               clientCoors = ev.clientX;                
             });
             
             node.addEventListener('drop',function(ev){
-                ev.preventDefault();
-                console.log(node);
+                // ev.preventDefault();
+                // ev.stopPropagation();
                 node.click();
             });
-        });           
+        });   
+        
+        document.body.addEventListener('dragover',function(ev){
+           console.log(ev);
+           clientCoors = ev.clientX; 
+        });        
 }
         
 RangeSlider.prototype.getRange = function(){
@@ -260,6 +294,7 @@ RangeSlider.prototype.movePointer = function(move,units){
    this.rangeProgress.style.width = move + units;
    this.monitorProgress(move);           
 };
+
                
         window.onload = function(){
                        
