@@ -161,74 +161,73 @@
    	this.rangeProgress = 
          Node.querySelector(".range-slider .range-progress"); 
    	this.currentRange = options.initialValue;
+    this.ptDrag = {};
+    this.isFocussed = false;
+    this.initDragObject();
      
     var slider = this,
         rangeWidth = (100/this.size),
-        sliderWidth = Node.clientWidth,
-        position = getOffset(Node),
-        ptDrag = {
-            minOffset:position.left,
-            maxOffset:position.max,
-            lastOffset:0,
-            start:0,            
-        };
-        
-     var clientCoors = 0;
+        sliderWidth = Node.clientWidth;
+
+         
+   this.movePointer(rangeWidth,"%");
     
-    this.movePointer(rangeWidth,"%");
-  
-   this.pointer.addEventListener('dragstart',function(ev){
-       ev.dataTransfer.setData('text/plain','I am draggable');
-       clientCoors = ev.clientX;
-       console.log(ev);
-       if( (ptDrag.minOffset === 0) || (ptDrag.maxOffset === 0)){
-           position = getOffset(Node);
-           ptDrag.minOffset = position.left;
-           ptDrag.maxOffset = position.max;
+   this.pointer.addEventListener("mousedown",function(ev){
+       ev.preventDefault();
+       slider.isFocussed = true;
+        
+       
+       if( (slider.ptDrag.minOffset === 0) || (slider.ptDrag.maxOffset === 0)){
+           slider.initDragObject();
            sliderWidth = Node.clientWidth;
        }
-       
-       console.log(ptDrag);
-       ptDrag.start = this.style.left;
+
+       slider.ptDrag.start = this.style.left;
        this.classList.remove('transitionable');
-       slider.rangeProgress.classList.remove('transitionable');
+       slider.rangeProgress.classList.remove('transitionable');       
+       
    });
    
-   this.pointer.addEventListener('drag',function(ev){
-        
-       ev.preventDefault();
-       ev.stopPropagation();
-       
-    //    if((ev.clientX >= ptDrag.minOffset) &&
-    //       (ev.clientX <= ptDrag.maxOffset) 
-    //      ){
+   window.addEventListener("mousemove",function(ev){
+      if(slider.isFocussed  === true){
+        if((ev.clientX >= slider.ptDrag.minOffset) &&
+           (ev.clientX <= slider.ptDrag.maxOffset) 
+          ){
           
-          console.log(ev);
-          var finalOffset = ( ( (clientCoors - ptDrag.minOffset) / sliderWidth ) ) * 100;
+          var finalOffset = ( ( (ev.clientX - slider.ptDrag.minOffset) / sliderWidth ) ) * 100;
             slider.movePointer(finalOffset,"%");
             
-            ptDrag.lastOffset = getOffset(this).left;
-         //}
-       
+            slider.ptDrag.lastOffset = getOffset(slider.pointer).left;
+         } 
+      } 
    });
-   
-   this.pointer.addEventListener('dragend',function(ev){
-        
-       var landingNode = Array.prototype.filter.call(slider.ranges,function(node){
+
+   window.addEventListener("mouseup",function(ev){
+      if(slider.isFocussed === true){
+         console.log(slider.ptDrag)
+        var landingNode = Array.prototype.filter.call(slider.ranges,function(node){
             
             var coords = getOffset(node);
             
-            return ((ptDrag.lastOffset >= coords.left ) && 
-                    (ptDrag.lastOffset <= coords.max )
+            return ((slider.ptDrag.lastOffset >= coords.left ) && 
+                    (slider.ptDrag.lastOffset <= coords.max )
                    );
             
        });
        
-       landingNode[0].click();
-       this.classList.add('transitionable');
-       slider.rangeProgress.classList.add('transitionable');
+        landingNode[0].click();
+        slider.pointer.classList.add('transitionable');
+        slider.rangeProgress.classList.add('transitionable');
+        slider.isFocussed = false;  
+      } 
    });
    
+     window.addEventListener("resize",function(ev){
+        slider.isFocussed = false;
+        slider.initDragObject(); 
+     });
+   
+     
     Array.prototype.forEach.call(slider.ranges,
         
         function(node,index,array){
@@ -253,21 +252,10 @@
                 }    
             });
             
-            node.addEventListener('dragover',function(ev){
-               clientCoors = ev.clientX;                
-            });
             
-            node.addEventListener('drop',function(ev){
-                // ev.preventDefault();
-                // ev.stopPropagation();
-                node.click();
-            });
+            
         });   
-        
-        document.body.addEventListener('dragover',function(ev){
-           console.log(ev);
-           clientCoors = ev.clientX; 
-        });        
+               
 }
         
 RangeSlider.prototype.getRange = function(){
@@ -295,6 +283,16 @@ RangeSlider.prototype.movePointer = function(move,units){
    this.monitorProgress(move);           
 };
 
+RangeSlider.prototype.initDragObject = function(){
+       this.position = getOffset(this.domNode);
+       this.ptDrag = {
+            minOffset:this.position.left,
+            maxOffset:this.position.max,
+            lastOffset:0,
+            start:0,            
+        }; 
+};
+
                
         window.onload = function(){
                        
@@ -310,13 +308,13 @@ RangeSlider.prototype.movePointer = function(move,units){
 
         <div class='range-slider' id="property-value-range">
 
-            <span class='pointer transitionable' draggable='true'></span>
+            <span class='pointer transitionable' ></span>
             <span class='range-progress transitionable'></span>
-            <span draggable="true" data-value="50000" class='range highlighted'><p>50000</p></span>
-            <span draggable="true" data-value="100000" class='range'><p>100000</p></span>
-            <span draggable="true" data-value="150000" class='range'><p>150000</p></span>
-            <span draggable="true" data-value="200000" class='range'><p>200000</p></span>
-            <span draggable="true" data-value="250000" class='range'><p>250000</p></span>
+            <span  data-value="50000" class='range highlighted'><p>50000</p></span>
+            <span  data-value="100000" class='range'><p>100000</p></span>
+            <span  data-value="150000" class='range'><p>150000</p></span>
+            <span  data-value="200000" class='range'><p>200000</p></span>
+            <span  data-value="250000" class='range'><p>250000</p></span>
 
         </div>
 
