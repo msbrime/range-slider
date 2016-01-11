@@ -125,6 +125,21 @@
         return base;        
     }
     
+    function debounce(func, wait, immediate) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+   }
+    
     function getOffset(node){
         var bodyDims = document.body.getBoundingClientRect();
         var nodeDims = node.getBoundingClientRect();
@@ -162,12 +177,12 @@
          Node.querySelector(".range-slider .range-progress"); 
    	this.currentRange = options.initialValue;
     this.ptDrag = {};
+    this.width = Node.clientWidth;
     this.isFocussed = false;
     this.initDragObject();
      
     var slider = this,
-        rangeWidth = (100/this.size),
-        sliderWidth = Node.clientWidth;
+        rangeWidth = (100/this.size);
 
          
    this.movePointer(rangeWidth,"%");
@@ -179,8 +194,10 @@
        
        if( (slider.ptDrag.minOffset === 0) || (slider.ptDrag.maxOffset === 0)){
            slider.initDragObject();
-           sliderWidth = Node.clientWidth;
+           slider.width = Node.clientWidth;
        }
+       
+       slider.ptDrag.maxOffset = getOffset(slider.ranges[(slider.size-1)]).max;
 
        slider.ptDrag.start = this.style.left;
        this.classList.remove('transitionable');
@@ -188,23 +205,36 @@
        
    });
    
-   window.addEventListener("mousemove",function(ev){
+   window.addEventListener("mousemove",debounce(function(ev){
       if(slider.isFocussed  === true){
         if((ev.clientX >= slider.ptDrag.minOffset) &&
            (ev.clientX <= slider.ptDrag.maxOffset) 
           ){
           
-          var finalOffset = ( ( (ev.clientX - slider.ptDrag.minOffset) / sliderWidth ) ) * 100;
+          var finalOffset = ( ( (ev.clientX - slider.ptDrag.minOffset) / slider.width ) ) * 100;
             slider.movePointer(finalOffset,"%");
             
-            slider.ptDrag.lastOffset = getOffset(slider.pointer).left;
+            var pointerCoors = getOffset(slider.pointer);
+            
+            slider.ptDrag.lastOffset = pointerCoors.left;
+            
+            if(pointerCoors.left < slider.ptDrag.minOffset){
+            	slider.ptDrag.lastOffset = slider.ptDrag.minOffset;
+            }
+            
+            if(pointerCoors.left > slider.ptDrag.maxOffset){
+            	slider.ptDrag.lastOffset = slider.ptDrag.maxOffset;	
+            }
+             
          } 
       } 
-   });
+   }),350);
 
    window.addEventListener("mouseup",function(ev){
+      
       if(slider.isFocussed === true){
-         console.log(slider.ptDrag)
+      	slider.isFocussed = false;
+        
         var landingNode = Array.prototype.filter.call(slider.ranges,function(node){
             
             var coords = getOffset(node);
@@ -218,7 +248,7 @@
         landingNode[0].click();
         slider.pointer.classList.add('transitionable');
         slider.rangeProgress.classList.add('transitionable');
-        slider.isFocussed = false;  
+          
       } 
    });
    
@@ -284,10 +314,10 @@ RangeSlider.prototype.movePointer = function(move,units){
 };
 
 RangeSlider.prototype.initDragObject = function(){
-       this.position = getOffset(this.domNode);
+	   this.width = this.domNode.clientWidth;
        this.ptDrag = {
-            minOffset:this.position.left,
-            maxOffset:this.position.max,
+            minOffset: getOffset(this.ranges[0]).left,
+            maxOffset: getOffset(this.ranges[(this.size-1)]).max,
             lastOffset:0,
             start:0,            
         }; 
