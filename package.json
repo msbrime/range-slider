@@ -1,0 +1,27 @@
+{
+  "name": "range_slider",
+  "version": "0.0.1",
+  "description": "A pure javascript range slider with cross browser support",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salisadecade/RangeSlider.git"
+  },
+  "keywords": [
+    "slider",
+    "range",
+    "vanillajs"
+  ],
+  "author": "Salis Braimah",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/salisadecade/RangeSlider/issues"
+  },
+  "homepage": "https://github.com/salisadecade/RangeSlider#readme",
+  "devDependencies": {
+    "gulp": "^3.9.0"
+  }
+}
