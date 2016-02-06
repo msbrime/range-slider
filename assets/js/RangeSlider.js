@@ -153,31 +153,44 @@ function RangeSlider(Node, options) {
     this.domNode = Node;
     this.isStepped = false;
     
+    //slider is built here
     this.build(options);
 
    	this.currentRange = options.min;
     this.ptDrag = {};
     this.width = Node.clientWidth;
     this.isFocussed = false;
+    
     this.initDragObject();
 
-    var slider = this,
+    var 
+        slider = this,
         rangeWidth = (100 / this.size);
 
     this.movePointer(rangeWidth, "%");
 
     this.pointer.addEventListener("mousedown", function (ev) {
+        
         ev.preventDefault();
         slider.isFocussed = true;
-
-
-        if ((slider.ptDrag.minOffset === 0) || (slider.ptDrag.maxOffset === 0)) {
-            slider.initDragObject();
-            slider.width = Node.clientWidth;
-        }
-
-        //slider.ptDrag.maxOffset = getOffset(slider.ranges[(slider.size - 1)]).max;
-
+        
+        /**
+         * Initialize the ptDrag object if it hasn't been
+         * already.This might happen if the slider is not 
+         * initially visible
+         */
+        if ( (slider.ptDrag.minOffset === 0) || 
+             (slider.ptDrag.maxOffset === 0)) 
+          {
+                slider.initDragObject();
+                slider.width = Node.clientWidth;
+          }
+        
+        /** 
+        slider.ptDrag.maxOffset = 
+            getOffset(slider.ranges[(slider.size - 1)]).max;
+        */
+        
         slider.ptDrag.start = this.style.left;
         this.classList.remove('transitionable');
         slider.rangeProgress.classList.remove('transitionable');
