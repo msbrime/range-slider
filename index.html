@@ -9,8 +9,10 @@
 <script>
     window.onload = function(){
                        
-            var rangeSlider = new RangeSlider(document.querySelector(".range-slider"));
-                   
+            var rangeSlider = new RangeSlider(document.querySelector("#my_range_test"));
+            
+            var rangeSlider2 = new RangeSlider(document.querySelector("#my_range_test2"));
+                     
         };
 
 </script>
@@ -18,18 +20,12 @@
 <body>
 
     <div class="container">
-
-        <div class='range-slider' id="property-value-range">
-
-            <span class='pointer transitionable'></span>
-            <span class='range-progress transitionable'></span>
-            <span data-value="50000" class='range highlighted'><p>50000</p></span>
-            <span data-value="100000" class='range'><p>100000</p></span>
-            <span data-value="150000" class='range'><p>150000</p></span>
-            <span data-value="200000" class='range'><p>200000</p></span>
-            <span data-value="250000" class='range'><p>250000</p></span>
-
-        </div>
+        
+        <div class = 'range-slider' id="my_range_test" data-min-value = '0' data-max-value = '1000'> </div>
+        
+        <div style = "margin-top:20px"></div>
+        
+        <div class = 'range-slider' id="my_range_test2" data-min-value = '0' data-max-value = '1000' data-steps = '7'> </div>
 
     </div>
 

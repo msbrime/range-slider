@@ -50,3 +50,13 @@ gulp.task("js",function(){
           .pipe(gulp.dest(js.out)); 
 });
 
+
+gulp.task('default',['sass','js'],function(){ 
+    
+    //Watch the js folder
+    gulp.watch(js.watch,['js']);
+    
+    //Watch the css folder
+    gulp.watch(css.watch,['sass']);
+});
+
