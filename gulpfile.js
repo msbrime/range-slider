@@ -45,7 +45,7 @@ gulp.task("js",function(){
           .pipe(jshint())
           .pipe(jshint.reporter('default'))
           .pipe(jshint.reporter('fail'))
-          .pipe(concat('rangeslider.js'))
+          .pipe(concat('rangeslider.min.js'))
           .pipe(uglify())
           .pipe(gulp.dest(js.out)); 
 });
