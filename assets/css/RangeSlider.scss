@@ -14,16 +14,16 @@
     
     .range-slider .pointer {
         position: absolute;
-        width: 10px;
-        left: 24%;
+        width: 22px;
+        left: 23%;
         background-color: #fefefe;
         -webkit-box-shadow: 0;
         box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.6) inset;
-        height: 20px;
-        top: -6px;
+        height: 22px;
+        top: -9px;
         cursor: pointer;
         z-index: 100;
-        border-radius: 2px;
+        border-radius: 20px;
         border: 1px solid #bbb;
     }
     
@@ -76,9 +76,11 @@
         position: relative;
         cursor: pointer;
         text-align: center;
+      
     }
     
-    .range:not(:last-of-type) {
+    .range.stepped:not(:last-of-type) {
+        
         border-right: 2px solid #aaa;
     }
     
