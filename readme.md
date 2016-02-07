@@ -21,16 +21,17 @@ the following HTML structure:
  
     new RangeSlider(document.querySelector('#my_range_slider'));
  
- ##Configuration
+ 
+ ##Configuration  
  RangeSlider comes with some useful config options:
  
- 1. **min**: The minimum value of the range  
+1. **min**: The minimum value of the range  
   _default_: 0
  
- 2. **max**: The maximum value of the range  
- _deafult:100
+2. **max**: The maximum value of the range  
+ _deafult_:100
  
- 3. **steps**: Display slider with stepped demarkations  
+3. **steps**: Display slider with stepped demarkations  
  _default_:false
  
  
@@ -40,21 +41,24 @@ the following HTML structure:
  > Options set via data attributes will be overwritten if redeclared or reassigned
  in the javascript object  
  
- ###Examples
  
- 1. To produce a stepped slider with a range minimum of _1000_, a
- range maximum of _10000_ and _10_ steps:  
-    
-     
+ ###Examples
+1. To produce a stepped slider with a range minimum of _1000_, a
+range maximum of _10000_ and _10_ steps:
+
+
+       
     <div id = 'my_range_slider' class = 'range-slider'  
     data-min-value = '1000' data-max-value = '10000' steps = '10'>
     </div>
+  
   > OR
+  
   
     var config = {
     min:1000,
     max:10000,
     steps:10
     };
-      
+    
     new RangeSlider(document.querySelector('#my_range_slider'),config);
