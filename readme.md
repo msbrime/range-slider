@@ -47,18 +47,18 @@ the following HTML structure:
  range maximum of _10000_ and _10_ steps:  
 
 
-       <div id = 'my_range_slider' class = 'range-slider'  
-       data-min-value = '1000' data-max-value = '10000' steps = '10'>
-       </div>
+    <div id = 'my_range_slider' class = 'range-slider'  
+    data-min-value = '1000' data-max-value = '10000' steps = '10'>
+    </div>
 
  
   > OR
   
   
     var config = {
-    min:1000,
-    max:10000,
-    steps:10
+       min:1000,
+       max:10000,
+       steps:10
     };
     
     new RangeSlider(document.querySelector('#my_range_slider'),config);

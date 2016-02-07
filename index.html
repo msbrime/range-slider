@@ -9,24 +9,41 @@
 <script>
     window.onload = function(){
                        
-            var rangeSlider = new RangeSlider(document.querySelector("#my_range_test"));
+            window.rangeSlider = RangeSlider.create(document.querySelector("#my_range_test"));
             
-            var rangeSlider2 = new RangeSlider(document.querySelector("#my_range_test2"));
+            window.rangeSlider2 = RangeSlider.create(document.querySelector("#my_range_test2"));
+            
+            window.rangeSlider3 = RangeSlider.create(document.querySelector("#my_range_test3"));
                      
+            rangeSlider2.setRange(500);
+            console.log(rangeSlider2.__proto__);
+            console.log(rangeSlider2.getRange());
         };
 
 </script>
+
+<style>
+    .container {
+        width: 50%;
+        margin-left:200px;
+        margin-top: 200px;
+    }
+</style>
 
 <body>
 
     <div class="container">
         
-        <div class = 'range-slider' id="my_range_test" data-min-value = '0' data-max-value = '1000'> </div>
+        <div class = 'range-slider' id="my_range_test" data-rs-min = '0' data-rs-max = '1000'> </div>
         
-        <div style = "margin-top:20px"></div>
+        <div style = "margin-top:50px"></div>
         
-        <div class = 'range-slider' id="my_range_test2" data-min-value = '0' data-max-value = '1000' data-steps = '7'> </div>
-
+        <div class = 'range-slider' id="my_range_test2" data-rs-min = '0' data-rs-max = '1000' data-rs-steps = '5'> </div>
+        
+        <div style = "margin-top:50px"></div>
+        
+        <div class = 'range-slider' id="my_range_test3"> </div>
+        
     </div>
 
 </body>
