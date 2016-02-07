@@ -6,10 +6,12 @@
     
     .range-slider {
         width: 100%;
-        height: 8px;
+        height: 4px;
+        border-radius:5px;
         border: 1px solid #aaa;
         position: relative;
         padding: 0;
+        cursor:pointer;
     }
     
     .range-slider .pointer {
@@ -17,18 +19,13 @@
         width: 22px;
         left: 23%;
         background-color: #fefefe;
-        -webkit-box-shadow: 0;
-        box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.6) inset;
         height: 22px;
-        top: -9px;
+        top: -10px;
         cursor: pointer;
         z-index: 100;
         border-radius: 20px;
         border: 1px solid #bbb;
-    }
-    
-    .range-slider .pointer {
-        
+        box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.2);
     }
     
     .transitionable{
@@ -54,7 +51,9 @@
         z-index: 1;
         width: 25%;
         height: 100%;
+        border-radius:5px;
         background-color: #99ff66;
+        box-shadow: 0px 0px 1px 1px rgba(102, 102, 102, 0.5) inset;
     }
     
     .range-progress.caution {

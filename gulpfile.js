@@ -34,12 +34,18 @@ var js = {
     watch: io.src+"js/**/*"
 };
 
+/**
+ * Css Task
+ */
 gulp.task("sass",function(){
    return gulp.src(css.in)
           .pipe(sass({outputStyle:"compressed"}))
           .pipe(gulp.dest(css.out)); 
 });
 
+/**
+ * JS Task
+ */
 gulp.task("js",function(){
    return gulp.src(js.in)
           .pipe(jshint())
@@ -50,7 +56,9 @@ gulp.task("js",function(){
           .pipe(gulp.dest(js.out)); 
 });
 
-
+/**
+ * Gulp default task
+ */
 gulp.task('default',['sass','js'],function(){ 
     
     //Watch the js folder
