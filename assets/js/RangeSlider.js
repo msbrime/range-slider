@@ -40,7 +40,19 @@ var RangeSlider = (function () {
             if (callNow) func.apply(context, args);
         };
     }
-
+    /**
+     * hasclass helper function
+     * 
+     * http://youmightnotneedjquery.com/#has_class
+     */
+    function hasClass(el, className) {
+        if (el.classList) {
+            el.classList.contains(className);
+        } else {
+            new RegExp('(^| )' + className + '( |$)', 'gi').test(el.className);
+        }
+    }
+    
     /**
      * Helper to calculate the actual position
      * of a DOM Element
@@ -83,8 +95,8 @@ var RangeSlider = (function () {
 
         spanElem.firstChild
             .appendChild(document.createTextNode(spanText));
-            
-        spanElem.setAttribute('data-rs-value',spanText);
+
+        spanElem.setAttribute('data-rs-value', spanText);
 
         return spanElem;
     }
@@ -137,8 +149,8 @@ var RangeSlider = (function () {
          */
         this.config = {
             steps: setDefault(node.attributes['data-rs-steps'], false),
-            min: setDefault(node.attributes['data-rs-min'], 0),
-            max: setDefault(node.attributes['data-rs-max'], 100),
+            min: parseInt(setDefault(node.attributes['data-rs-min'], 0)),
+            max: parseInt(setDefault(node.attributes['data-rs-max'], 100)),
             onRangeChange: function () { },
             afterInit: function () { },
         };
@@ -160,11 +172,13 @@ var RangeSlider = (function () {
         
         //contextual reference for this keyword
         var slider = this;
-            
-        this.movePointer(this.rangeWidth, "%");
+
+        this.slide(this.rangeWidth, "%");
 
         this.pointer.addEventListener("mousedown", function (ev) {
-
+            if (ev.which !== 1) {
+                return;
+            }
             ev.preventDefault();
             slider.isFocussed = true;
         
@@ -192,67 +206,77 @@ var RangeSlider = (function () {
 
         window.addEventListener("mousemove", debounce(function (ev) {
             if (slider.isFocussed === true) {
-                
+
                 var finalOffset;
-                
-                if(ev.clientX < slider.ptDrag.minOffset){
+
+                if (ev.clientX < slider.ptDrag.minOffset) {
                     finalOffset = slider.evalPosition(slider.ptDrag.minOffset);
                 }
-                
-                if(ev.clientX > slider.ptDrag.maxOffset){
+
+                if (ev.clientX > slider.ptDrag.maxOffset) {
                     finalOffset = slider.evalPosition(slider.ptDrag.maxOffset);
                 }
-                
+
                 if ((ev.clientX > slider.ptDrag.minOffset) &&
                     (ev.clientX < slider.ptDrag.maxOffset)
                     ) {
-                        finalOffset = slider.evalPosition(ev.clientX);
-                    }
-                    
-
-                    slider.movePointer(finalOffset, "%");
-
-                    var pointerCoors = getOffset(slider.pointer);
-
-                    slider.ptDrag.lastOffset = pointerCoors.left;
-
-                    if (pointerCoors.left < slider.ptDrag.minOffset) {
-                        slider.ptDrag.lastOffset = slider.ptDrag.minOffset ;
-                    }
-
-                    if (pointerCoors.left > slider.ptDrag.maxOffset) {
-                        slider.ptDrag.lastOffset = slider.ptDrag.maxOffset;
-                    }            
-                
-            }
-        }), 350);
-
-        window.addEventListener("mouseup", function (ev) {
-                      
-            if (slider.isFocussed === true) {
-                slider.isFocussed = false;
-                
-                if (slider.isStepped) {
-                                
-                  var offset = slider.evalPosition(slider.ptDrag.lastOffset);
-                   
-                   offset = ( offset / 100 ) * slider.scope;
-                   
-                   slider.setRange(Math.ceil(offset));
-                   
+                    finalOffset = slider.evalPosition(ev.clientX);
                 }
 
+
+                slider.slide(finalOffset, "%");
+
+                var pointerCoors = getOffset(slider.pointer);
+
+                slider.ptDrag.lastOffset = pointerCoors.left;
+
+                if (pointerCoors.left < slider.ptDrag.minOffset) {
+                    slider.ptDrag.lastOffset = slider.ptDrag.minOffset;
+                }
+
+                if (pointerCoors.left > slider.ptDrag.maxOffset) {
+                    slider.ptDrag.lastOffset = slider.ptDrag.maxOffset;
+                }
+
+            }
+        }), 350);
+        
+        /**
+         * Event listener for mouseup event,simulates
+         * the pointer being released from drag mode
+         */
+        window.addEventListener("mouseup", function (ev) {
+
+            if (slider.isFocussed === true) {
+                slider.isFocussed = false;
+
+                var offset = slider.evalPosition(slider.ptDrag.lastOffset);
+
+                offset = (Math.ceil(offset) / 100) * slider.scope;
+                
+                console.log(offset);
+                
+                slider.setRange(Math.ceil(offset) + slider.config.min);
+           
                 slider.pointer.classList.add('transitionable');
                 slider.rangeProgress.classList.add('transitionable');
-                
+
             }
         });
-
+        
+        /**
+         * Event listener for the resize event,calls reinit
+         * to recalculate dimensions and offsets
+         */
         window.addEventListener("resize", function (ev) {
             slider.isFocussed = false;
             slider.reInit();
         });
 
+        /**
+         * If the stepped option is set,then register click handlers
+         * for the step spans
+         */
         if (this.isStepped) {
             Array.prototype.forEach.call(slider.ranges,
 
@@ -261,31 +285,38 @@ var RangeSlider = (function () {
                     node.style.width = slider.rangeWidth + "%";
 
                     node.addEventListener('click', function () {
-                            
-                            Array.prototype.forEach.call(slider.ranges,
-                                function (node, index, array) {
-                                    node.classList.remove("highlighted");
-                                });
 
-                            this.classList.add("highlighted");
-                            
-                            slider.movePointer((index + 1) * (slider.rangeWidth ), "%"); 
-                            
-                            slider.currentRange = this.getAttribute('data-rs-value');
-                        
+                        Array.prototype.forEach.call(slider.ranges,
+                            function (node, index, array) {
+                                node.classList.remove("highlighted");
+                            });
+
+                        this.classList.add("highlighted");
+
+                        slider.slide((index + 1) * (slider.rangeWidth), "%");
+
+                        slider.currentRange = this.getAttribute('data-rs-value');
+
+                        slider.config.onRangeChange();
+
                     });
 
                 });
         }
-        else {
+        else { //else add the listener to the slider itself
             this.baseElement.addEventListener('click', function (e) {
                 if (e.target !== slider.pointer) {
+                    
                     var finalOffset = slider.evalPosition(e.clientX);
-                    slider.movePointer(finalOffset, "%");
+                    
+                    finalOffset = (finalOffset / 100) * slider.scope;
+                    
+                    slider.setRange(Math.ceil(finalOffset) + slider.config.min);
                 }
             });
         }
-
+        
+        //run the after user's afterinit callback
         this.config.afterInit();
 
     }
@@ -299,7 +330,7 @@ var RangeSlider = (function () {
      * @return Number
      */
     RangeSlider.prototype.getRange = function () {
-        return this.currentRange;
+        return parseInt(this.currentRange);
     };
 
     /**
@@ -312,33 +343,51 @@ var RangeSlider = (function () {
      * @return void
      */
     RangeSlider.prototype.setRange = function (value) {
-         
-         value = parseInt(value);           
+
+        value = parseInt(value);           
         /**
          * If steps are enabled handle the click event of the 
          * step in which the value supplied falls
          */
-        if(this.config.steps){
-         
-            var dropNode = this.scope / parseInt(this.size);
+        if (this.isStepped) {
+
+            var multiplier = 0,
+            dropNode = this.scope / this.size;
+
+            while ((this.config.min + (dropNode * multiplier)) < value) {
+                multiplier += 1; 
+            }
             
-            dropNode =  Math.floor( (value / dropNode));
+            //dropNode =  Math.floor( (value / dropNode));
             
             //if the value doesnt fall within the range,abort!!
-            if(dropNode < 0 || dropNode > this.size ){
+            if (multiplier < 0 || multiplier > this.size) {
                 return;
             }
-            else{
-                this.ranges[dropNode].click();
+            else {
+                this.ranges[multiplier].click();
+                this.config.onRangeChange();
             }
-          }
-         else{
-             
+        }
+        else {
+                value = (value < this.config.min) ?
+                        this.config.min:
+                        value;
+                value = (value > this.config.max) ?
+                        this.config.max:
+                        value;  
+
+            var move = (value - this.config.min) / this.scope;
+            move *= 100;
+
+            this.currentRange = value;
+            this.slide(move, "%");
+            this.config.onRangeChange();
          }
        
-        
-      this.config.onRangeChange();
     };
+
+
 
     RangeSlider.prototype.updateProgress = function (percentage) {
         if (percentage > 60) {
@@ -357,9 +406,9 @@ var RangeSlider = (function () {
 
 
     /**
-     * movePointer method for RangeSlider
+     * slide method for RangeSlider
      * 
-     * The movePointer method accepts the distance
+     * The slide method accepts the distance
      * to move the target element(slider) and the
      * unit of movement
      * 
@@ -367,11 +416,12 @@ var RangeSlider = (function () {
      * @param string units
      * @return void
      */
-    RangeSlider.prototype.movePointer = function (move, units) {
-        this.pointer.style.left = (move -1) + units;
+    RangeSlider.prototype.slide = function (move, units) {
+        this.pointer.style.left = (move - 1) + units;
         this.rangeProgress.style.width = move + units;
         this.updateProgress(move);
     };
+
 
     /**
      * initDragObject method for RangeSlider
@@ -390,6 +440,7 @@ var RangeSlider = (function () {
         };
     };
 
+
     /**
      * init method for RangeSlider
      * 
@@ -401,36 +452,49 @@ var RangeSlider = (function () {
      */
     RangeSlider.prototype.init = function () {
 
-        this.pointer = document.createElement('span');
-        this.rangeProgress = document.createElement('span');
+        if (!hasClass(this.baseElement, 'range-slider')) {
+            this.baseElement.classList.add('range-slider');
+        }
 
+        this.pointer = document.createElement('span');
+        this.rangeProgress = document.createElement('span'); 
+                
         this.pointer.classList.add('pointer', 'transitionable');
-        this.rangeProgress.classList.add('range-progress', 'transitionable');
+        
+        this.rangeProgress
+            .classList.add('range-progress', 'transitionable');
 
         this.baseElement.appendChild(this.pointer);
         this.baseElement.appendChild(this.rangeProgress);
 
-        if (this.config.steps) {
-
-            this.ranges = this.createRangeNodes();
-            this.size = parseInt(this.config.steps);
-            this.rangeWidth = (100 / this.size);
-            this.isStepped = true;
-        }
-        
-        this.scope  = 
-            parseInt(this.config.max) - parseInt(this.config.min);  
+        this.scope = this.config.max - this.config.min;
         this.currentRange = this.config.min;
         this.ptDrag = {};
         this.width = this.baseElement.clientWidth;
         this.isFocussed = false;
 
         this.initDragObject();
+
+        if (this.config.steps) {
+
+            this.size = parseInt(this.config.steps);
+            this.ranges = this.createRangeNodes();
+            this.rangeWidth = (100 / this.size);
+            this.isStepped = true;
+
+        }
     };
     
-    RangeSlider.prototype.reInit= function(){
-        this.scope  = 
-            parseInt(this.config.max) - parseInt(this.config.min);  
+    /**
+     * reInit method
+     * 
+     * reinitializes the slider values that pertain
+     * to offset calculation
+     * 
+     * @return void
+     */
+    RangeSlider.prototype.reInit = function () {
+
         this.currentRange = this.config.min;
         this.ptDrag = {};
         this.width = this.baseElement.clientWidth;
@@ -440,7 +504,7 @@ var RangeSlider = (function () {
     };
 
     /**
-     * evalSliderPosition helper function
+     * evalPosition method
      * 
      * evaluates the slider position that relates
      * to the position of the mouse on execution
@@ -454,25 +518,25 @@ var RangeSlider = (function () {
         return (((offset - this.ptDrag.minOffset) / this.width)) * 100;
     };
     
+    /**
+     * createRangeNodes method
+     * 
+     * creates the stepping spans if the stepped
+     * mode is chosen
+     * 
+     * @return Array 
+     */
     RangeSlider.prototype.createRangeNodes = function () {
         var
             slider = this,
 
             aSpanClasses = ['range', 'stepped'],
 
-            minimum = parseFloat(this.config.min),
-
-            maximum = parseFloat(this.config.max),
-
-            steps = parseFloat(this.config.steps),
-
-            scope = maximum - minimum,
-
-            stepValue = scope / steps,
+            stepValue = this.scope / this.size,
 
             aNodeArray = [];
 
-        for (var i = 1; i <= steps; i++) {
+        for (var i = 1; i <= slider.size; i++) {
             var rangeSpan = document.createElement('span');
             rangeSpan.appendChild(document.createElement('p'));
 
@@ -480,18 +544,18 @@ var RangeSlider = (function () {
                 case (i === 0):
                     rangeSpan =
                     createSpan(rangeSpan, aSpanClasses,
-                        String(minimum + (i * stepValue)));
+                        String(slider.config.min + (i * stepValue)));
                     rangeSpan.classList.add('highlighted');
                     break;
-                case ((steps - i) === 0):
+                case ((slider.size - i) === 0):
                     rangeSpan =
                     createSpan(rangeSpan, aSpanClasses,
-                        this.config.max);
+                        slider.config.max);
                     break;
                 default:
                     rangeSpan =
                     createSpan(rangeSpan, aSpanClasses,
-                        String(Math.round(minimum + (i * stepValue))));
+                        String(Math.round(slider.config.min + (i * stepValue))));
                     break;
             }
 
@@ -501,12 +565,16 @@ var RangeSlider = (function () {
 
         return aNodeArray;
     };
-
+    
+    /**
+     * Return the wrapper object for
+     * the RangeSlider object
+     */
     return {
-            create:function(node,options){
-               var slider =  new RangeSlider(node,options);
-               return slider; 
-            }
+        create: function (node, options) {
+            var slider = new RangeSlider(node, options);
+            return slider;
+        }
     };
 
 })();
