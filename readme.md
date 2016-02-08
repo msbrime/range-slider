@@ -128,3 +128,8 @@ store it in a variable like shown above
         }
     
         RangeSlider.create('#my_range_slider',config);
+        
+##Coming Soon
+* Dual Slider pointers
+* Slider style options (thin, normal, jumbo)
+* Vertical sliders
