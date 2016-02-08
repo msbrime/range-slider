@@ -2,10 +2,10 @@ var RangeSlider = (function () {
 
     /**
      * The extend helper function
-     * 
+     *
      * Helper function to merge multiple
      * objects into a single object
-     * 
+     *
      * @return Object
      */
     function extend() {
@@ -23,7 +23,7 @@ var RangeSlider = (function () {
 
     /**
      * Debouncing function courtesy of David Walsh
-     * 
+     *
      * https://davidwalsh.name/javascript-debounce-function
      */
     function debounce(func, wait, immediate) {
@@ -42,7 +42,7 @@ var RangeSlider = (function () {
     }
     /**
      * hasclass helper function
-     * 
+     *
      * http://youmightnotneedjquery.com/#has_class
      */
     function hasClass(el, className) {
@@ -52,17 +52,17 @@ var RangeSlider = (function () {
             new RegExp('(^| )' + className + '( |$)', 'gi').test(el.className);
         }
     }
-    
+
     /**
      * Helper to calculate the actual position
      * of a DOM Element
-     * 
+     *
      * Helper function to calculate the actual
-     * position of elements with respect to the 
+     * position of elements with respect to the
      * DOM Window
-     * 
+     *
      * @param node node
-     * @return Object 
+     * @return Object
      */
     function getOffset(node) {
         var bodyDims = document.body.getBoundingClientRect();
@@ -78,10 +78,10 @@ var RangeSlider = (function () {
 
     /**
      * createSpan helper function
-     * 
-     * Creates spans from a supplied elem,class 
+     *
+     * Creates spans from a supplied elem,class
      * list and text
-     * 
+     *
      * @param Element spanElem
      * @param Array classes
      * @param String spanText
@@ -103,15 +103,15 @@ var RangeSlider = (function () {
 
     /**
      * setDefault heper function
-     * 
+     *
      * checks if a data attribute exists
      * on an element,retruning its value
      * if it does or a default fallback if
      * it doesnt
-     * 
+     *
      * @param attribute attr
      * @param mixed fallback
-     * @return mixed 
+     * @return mixed
      */
     function setDefault(attr, fallBack) {
         return (attr) ? attr.value : fallBack;
@@ -119,32 +119,32 @@ var RangeSlider = (function () {
 
     /**
      * Constructor for the RangeSlider object
-     * 
+     *
      * Intended constructor function that inits
      * a RangeSlider object from a supplied DOM
      * node and an optional options object
-     * 
+     *
      * @constructor
      * @param node node
      * @param Object options
      * @return RangeSlider
      */
     function RangeSlider(node, options) {
-    
+
         /**
-         * Check if the node RangeSlider is being 
+         * Check if the node RangeSlider is being
          * registered on exists in the document
          */
         if (!node) {
             console.info("No node to attach Slider to");
             return;
         }
-    
+
         /**
          * Default config object
-         * 
+         *
          * Sets up the slider with data attribute
-         * values or a preset default if the key doesn't 
+         * values or a preset default if the key doesn't
          * exist
          */
         this.config = {
@@ -154,7 +154,7 @@ var RangeSlider = (function () {
             onRangeChange: function () { },
             afterInit: function () { },
         };
-    
+
         /**
          * Extending the config file with the
          * options passed to the constructor
@@ -166,10 +166,10 @@ var RangeSlider = (function () {
 
         this.baseElement = node;
         this.isStepped = false;
-    
+
         //slider is built here
         this.init();
-        
+
         //contextual reference for this keyword
         var slider = this;
 
@@ -181,10 +181,10 @@ var RangeSlider = (function () {
             }
             ev.preventDefault();
             slider.isFocussed = true;
-        
+
             /**
              * Initialize the ptDrag object if it hasn't been
-             * already.This might happen if the slider is not 
+             * already.This might happen if the slider is not
              * initially visible
              */
             if ((slider.ptDrag.minOffset === 0) ||
@@ -192,9 +192,9 @@ var RangeSlider = (function () {
                 slider.initDragObject();
                 slider.width = node.clientWidth;
             }
-        
-            /** 
-            slider.ptDrag.maxOffset = 
+
+            /**
+            slider.ptDrag.maxOffset =
                 getOffset(slider.ranges[(slider.size - 1)]).max;
             */
 
@@ -240,7 +240,7 @@ var RangeSlider = (function () {
 
             }
         }), 350);
-        
+
         /**
          * Event listener for mouseup event,simulates
          * the pointer being released from drag mode
@@ -253,17 +253,15 @@ var RangeSlider = (function () {
                 var offset = slider.evalPosition(slider.ptDrag.lastOffset);
 
                 offset = (Math.ceil(offset) / 100) * slider.scope;
-                
-                console.log(offset);
-                
+
                 slider.setRange(Math.ceil(offset) + slider.config.min);
-           
+
                 slider.pointer.classList.add('transitionable');
                 slider.rangeProgress.classList.add('transitionable');
 
             }
         });
-        
+
         /**
          * Event listener for the resize event,calls reinit
          * to recalculate dimensions and offsets
@@ -306,16 +304,16 @@ var RangeSlider = (function () {
         else { //else add the listener to the slider itself
             this.baseElement.addEventListener('click', function (e) {
                 if (e.target !== slider.pointer) {
-                    
+
                     var finalOffset = slider.evalPosition(e.clientX);
-                    
+
                     finalOffset = (finalOffset / 100) * slider.scope;
-                    
+
                     slider.setRange(Math.ceil(finalOffset) + slider.config.min);
                 }
             });
         }
-        
+
         //run the after user's afterinit callback
         this.config.afterInit();
 
@@ -323,7 +321,7 @@ var RangeSlider = (function () {
 
     /**
      * getRange method for RangeSlider
-     * 
+     *
      * The getRange method returns the currently
      * selected range
      *
@@ -335,7 +333,7 @@ var RangeSlider = (function () {
 
     /**
      * setRange method for RangeSlider
-     * 
+     *
      * The setRange method sets the current
      * selected range and performs a specified
      * callback function if range change was successful
@@ -344,9 +342,16 @@ var RangeSlider = (function () {
      */
     RangeSlider.prototype.setRange = function (value) {
 
-        value = parseInt(value);           
+        value = parseInt(value);
+
+        value = (value < this.config.min) ?
+                    this.config.min:
+                    value;
+        value = (value > this.config.max) ?
+                    this.config.max:
+                    value;
         /**
-         * If steps are enabled handle the click event of the 
+         * If steps are enabled handle the click event of the
          * step in which the value supplied falls
          */
         if (this.isStepped) {
@@ -354,28 +359,15 @@ var RangeSlider = (function () {
             var multiplier = 0,
             dropNode = this.scope / this.size;
 
-            while ((this.config.min + (dropNode * multiplier)) < value) {
-                multiplier += 1; 
-            }
-            
-            //dropNode =  Math.floor( (value / dropNode));
-            
-            //if the value doesnt fall within the range,abort!!
-            if (multiplier < 0 || multiplier > this.size) {
-                return;
-            }
-            else {
-                this.ranges[multiplier].click();
-                this.config.onRangeChange();
-            }
+            do{
+                multiplier += 1;
+            }while(( (this.config.min + (dropNode * multiplier)) < value));
+
+            this.ranges[(multiplier - 1)].click();
+            this.config.onRangeChange();
+
         }
         else {
-                value = (value < this.config.min) ?
-                        this.config.min:
-                        value;
-                value = (value > this.config.max) ?
-                        this.config.max:
-                        value;  
 
             var move = (value - this.config.min) / this.scope;
             move *= 100;
@@ -384,7 +376,7 @@ var RangeSlider = (function () {
             this.slide(move, "%");
             this.config.onRangeChange();
          }
-       
+
     };
 
 
@@ -407,11 +399,11 @@ var RangeSlider = (function () {
 
     /**
      * slide method for RangeSlider
-     * 
+     *
      * The slide method accepts the distance
      * to move the target element(slider) and the
      * unit of movement
-     * 
+     *
      * @param number move
      * @param string units
      * @return void
@@ -425,7 +417,7 @@ var RangeSlider = (function () {
 
     /**
      * initDragObject method for RangeSlider
-     * 
+     *
      * The initDragObject method defines the points
      * through which the pointer can move
      */
@@ -443,11 +435,11 @@ var RangeSlider = (function () {
 
     /**
      * init method for RangeSlider
-     * 
+     *
      * The init method generates the HTML
      * structure for the slider and sets up
      * all the internals
-     * 
+     *
      * @return void
      */
     RangeSlider.prototype.init = function () {
@@ -457,10 +449,10 @@ var RangeSlider = (function () {
         }
 
         this.pointer = document.createElement('span');
-        this.rangeProgress = document.createElement('span'); 
-                
+        this.rangeProgress = document.createElement('span');
+
         this.pointer.classList.add('pointer', 'transitionable');
-        
+
         this.rangeProgress
             .classList.add('range-progress', 'transitionable');
 
@@ -484,13 +476,13 @@ var RangeSlider = (function () {
 
         }
     };
-    
+
     /**
      * reInit method
-     * 
+     *
      * reinitializes the slider values that pertain
      * to offset calculation
-     * 
+     *
      * @return void
      */
     RangeSlider.prototype.reInit = function () {
@@ -505,26 +497,26 @@ var RangeSlider = (function () {
 
     /**
      * evalPosition method
-     * 
+     *
      * evaluates the slider position that relates
      * to the position of the mouse on execution
      * of an action
-     * 
+     *
      * @param Number offset
      * @return Integer
-     * 
+     *
      */
     RangeSlider.prototype.evalPosition = function (offset) {
         return (((offset - this.ptDrag.minOffset) / this.width)) * 100;
     };
-    
+
     /**
      * createRangeNodes method
-     * 
+     *
      * creates the stepping spans if the stepped
      * mode is chosen
-     * 
-     * @return Array 
+     *
+     * @return Array
      */
     RangeSlider.prototype.createRangeNodes = function () {
         var
@@ -565,7 +557,7 @@ var RangeSlider = (function () {
 
         return aNodeArray;
     };
-    
+
     /**
      * Return the wrapper object for
      * the RangeSlider object
