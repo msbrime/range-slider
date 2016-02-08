@@ -84,13 +84,13 @@ store it in a variable like shown above
    
    > OR
    
-        var config = {
-            min:1000,
-            max:7200,
-            steps:8
-        };
+            var config = {
+                min:1000,
+                max:7200,
+                steps:8
+            };
     
-        RangeSlider.create('#my_range_slider',config);
+            RangeSlider.create('#my_range_slider',config);
     
 ##Methods
 
@@ -106,7 +106,8 @@ store it in a variable like shown above
     `myRangeSlider.reInit();` 
 
 ##Callbacks
- These are declared in the config object
+These are declared in the config object  
+
 1. **afterInit**: A function to be executed once the slider has been set up 
    successfully.The slider can be passed as an argument
    
@@ -117,7 +118,7 @@ store it in a variable like shown above
         }
         
         RangeSlider.create('#my_range_slider',config);
-      
+
 2. **onRangeChange**: A function to be executed whenever the value of the slider 
    changes.The slider can be passed as an argument
    
