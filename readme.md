@@ -21,8 +21,7 @@ an HTML element similar to:
  
     var myRangeSlider = RangeSlider.create('#my_range_slider');
 
->To access the properties and methods on the slider you must   
-store it in a variable like shown above
+>To access the properties and methods on the slider you must store it in a variable like shown above
  
 ##Configuration
   
@@ -82,7 +81,7 @@ store it in a variable like shown above
     
         RangeSlider.create('#my_range_slider');
    
-   > OR
+    > OR
    
             var config = {
                 min:1000,
