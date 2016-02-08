@@ -9,20 +9,20 @@
 <script>
     window.onload = function(){
         
-            // var options = {
-            //     onRangeChange:function(){
-            //       alert('range changed');  
-            //     },
-            //     afterInit:function(){
-            //         alert("I have been initialized");
-            //     }
-            // }
+            var options = {
+                onRangeChange:function(slider){
+                  //slider.setRange(240);  
+                },
+                afterInit:function(slider){
+                    slider.setRange(240);
+                }
+            }
                        
-            window.rangeSlider = RangeSlider.create(document.querySelector("#my_range_test"));
+            window.rangeSlider = RangeSlider.create("#my_range_test",options);
             
-            window.rangeSlider2 = RangeSlider.create(document.querySelector("#my_range_test2"));
+            window.rangeSlider2 = RangeSlider.create("#my_range_test2");
             
-            window.rangeSlider3 = RangeSlider.create(document.querySelector("#my_range_test3"));
+            window.rangeSlider3 = RangeSlider.create("#my_range_test3");
                      
             rangeSlider2.setRange(400);
             console.log(rangeSlider2.getRange());
@@ -42,11 +42,15 @@
 
     <div class="container">
         
-        <div id="my_range_test" data-rs-min = '0' data-rs-max = '250'> </div>
+        <div id="my_range_test" data-rs-min = '0' data-rs-max = '250'> 
+            <p>this is html</p>
+            <p>More html</p>
+        </div>
         
         <div style = "margin-top:50px"></div>
         
-        <div id="my_range_test2" data-rs-min = '5000' data-rs-max = '50000' data-rs-steps = '20'> </div>
+        <div id="my_range_test2" data-rs-min = '5000' data-rs-max = '50000' data-rs-steps = '20'> 
+        </div>
         
         <div style = "margin-top:50px" ></div>
         

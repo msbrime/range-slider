@@ -295,7 +295,7 @@ var RangeSlider = (function () {
 
                         slider.currentRange = this.getAttribute('data-rs-value');
 
-                        slider.config.onRangeChange();
+                        slider.config.onRangeChange(slider);
 
                     });
 
@@ -315,7 +315,7 @@ var RangeSlider = (function () {
         }
 
         //run the after user's afterinit callback
-        this.config.afterInit();
+        this.config.afterInit(slider);
 
     }
 
@@ -444,6 +444,8 @@ var RangeSlider = (function () {
      */
     RangeSlider.prototype.init = function () {
 
+       this.baseElement.innerHTML = "";
+
         if (!hasClass(this.baseElement, 'range-slider')) {
             this.baseElement.classList.add('range-slider');
         }
@@ -564,7 +566,8 @@ var RangeSlider = (function () {
      */
     return {
         create: function (node, options) {
-            var slider = new RangeSlider(node, options);
+            var slider =
+                new RangeSlider(document.querySelector(node), options);
             return slider;
         }
     };
