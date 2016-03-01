@@ -40,6 +40,7 @@ var RangeSlider = (function () {
             if (callNow) func.apply(context, args);
         };
     }
+
     /**
      * hasclass helper function
      *
@@ -175,11 +176,13 @@ var RangeSlider = (function () {
 
         this.slide(this.rangeWidth, "%");
 
+        //mosuedown event listener
         this.pointer.addEventListener("mousedown", function (ev) {
             if (ev.which !== 1) {
                 return;
             }
             ev.preventDefault();
+            ev.stopPropagation();
             slider.isFocussed = true;
 
             /**
@@ -237,6 +240,12 @@ var RangeSlider = (function () {
                 if (pointerCoors.left > slider.ptDrag.maxOffset) {
                     slider.ptDrag.lastOffset = slider.ptDrag.maxOffset;
                 }
+
+                var offset = slider.evalPosition(slider.ptDrag.lastOffset);
+
+                offset = (Math.ceil(offset) / 100) * slider.scope;
+
+                slider.setRange(Math.ceil(offset) + slider.config.min);
 
             }
         }), 350);
@@ -314,7 +323,7 @@ var RangeSlider = (function () {
             });
         }
 
-        //run the after user's afterinit callback
+        //run the user's afterinit callback
         this.config.afterInit(slider);
 
     }
@@ -364,7 +373,6 @@ var RangeSlider = (function () {
             }while(( (this.config.min + (dropNode * multiplier)) < value));
 
             this.ranges[(multiplier - 1)].click();
-            this.config.onRangeChange();
 
         }
         else {
@@ -374,8 +382,9 @@ var RangeSlider = (function () {
 
             this.currentRange = value;
             this.slide(move, "%");
-            this.config.onRangeChange();
          }
+
+        this.config.onRangeChange(this);
 
     };
 
@@ -409,8 +418,11 @@ var RangeSlider = (function () {
      * @return void
      */
     RangeSlider.prototype.slide = function (move, units) {
+        
         this.pointer.style.left = (move - 1) + units;
+        
         this.rangeProgress.style.width = move + units;
+        
         this.updateProgress(move);
     };
 
@@ -422,8 +434,11 @@ var RangeSlider = (function () {
      * through which the pointer can move
      */
     RangeSlider.prototype.initDragObject = function () {
+        
         this.width = this.baseElement.clientWidth;
+        
         var offsets = getOffset(this.baseElement);
+        
         this.ptDrag = {
             minOffset: offsets.left,
             maxOffset: offsets.max,
